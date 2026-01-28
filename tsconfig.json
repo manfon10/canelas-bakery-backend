@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+      "@app/*": ["src/app/*"],
+      "@contexts/*": ["src/contexts/*"],
+      "@auth/*": ["src/contexts/auth/*"],
+      "@cart/*": ["src/contexts/cart/*"],
+      "@content/*": ["src/contexts/content/*"],
+      "@delivery/*": ["src/contexts/delivery/*"],
+      "@discounts/*": ["src/contexts/discounts/*"],
+      "@orders/*": ["src/contexts/orders/*"],
+      "@payments/*": ["src/contexts/payments/*"],
+      "@pets/*": ["src/contexts/pets/*"],
+      "@production/*": ["src/contexts/production/*"],
+      "@products/*": ["src/contexts/products/*"],
+      "@shared/*": ["src/contexts/shared/*"],
+      "@users/*": ["src/contexts/users/*"]
+    },
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}

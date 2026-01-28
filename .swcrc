@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/swcrc",
+  "sourceMaps": true,
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
+    },
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+      "@app/*": ["src/app/*"],
+      "@contexts/*": ["src/contexts/*"],
+      "@auth/*": ["src/contexts/auth/*"],
+      "@cart/*": ["src/contexts/cart/*"],
+      "@content/*": ["src/contexts/content/*"],
+      "@delivery/*": ["src/contexts/delivery/*"],
+      "@discounts/*": ["src/contexts/discounts/*"],
+      "@orders/*": ["src/contexts/orders/*"],
+      "@payments/*": ["src/contexts/payments/*"],
+      "@pets/*": ["src/contexts/pets/*"],
+      "@production/*": ["src/contexts/production/*"],
+      "@products/*": ["src/contexts/products/*"],
+      "@shared/*": ["src/contexts/shared/*"],
+      "@users/*": ["src/contexts/users/*"]
+    },
+    "target": "es2022"
+  },
+  "minify": false
+}
