@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { TypeOrmDatabaseModule } from '@/contexts/shared/infraestructure/database/typeorm/typeorm.module';
+import { TypeOrmDatabaseModule } from '@/contexts/shared/database/typeorm/typeorm.module';
+
 import { UserModule } from '@/contexts/users/user.module';
+import { AuthModule } from '@/contexts/auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { UserModule } from '@/contexts/users/user.module';
 
     TypeOrmDatabaseModule,
 
+    AuthModule,
     UserModule,
   ],
 })

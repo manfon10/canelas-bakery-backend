@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { GetAllUsersUseCase } from '@/contexts/users/application/use-cases';
+
+import { GetAllUsersUseCase } from '@/contexts/users/application/get-all-users';
 import { User } from '@/contexts/users/domain/entities';
 
 @Controller('/users')

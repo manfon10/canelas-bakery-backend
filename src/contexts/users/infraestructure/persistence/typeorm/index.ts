@@ -1,1 +1,1 @@
-export { UserSchema } from './user.schema';
+export { TypeOrmUserRepository } from './user.repository';

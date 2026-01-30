@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TypeOrmUserRepository } from './infraestructure/repositories';
-import { UserSchema } from './infraestructure/persistence/typeorm';
-import { GetAllUsersController } from './infraestructure/http';
-import { GetAllUsersUseCase } from './application/use-cases';
+import { GetAllUsersController } from './infraestructure/controllers';
+
+import { GetAllUsersUseCase } from './application';
+
+import { UserSchema } from './infraestructure/persistence/schemas';
+import { TypeOrmUserRepository } from './infraestructure/persistence/typeorm';
 
 @Module({
   controllers: [GetAllUsersController],
