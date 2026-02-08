@@ -21,6 +21,19 @@ export class SendLoginCodeUseCase {
       throw new BadRequestException('El correo es invalido');
     }
 
-    await this.emailAdapter.sendVerificationCode(email, '123456');
+    const expires = new Date(emailExists.expires_email_code);
+
+    if (!isNaN(expires.getTime()) && expires > new Date()) {
+      throw new BadRequestException('Tiene un codigo activo para ser validado');
+    }
+
+    const code = emailExists.codeLogin();
+
+    await this.userRepository.update(emailExists.id, {
+      login_email_code: code,
+      expires_email_code: new Date(Date.now() + 10 * 60 * 1000),
+    });
+
+    await this.emailAdapter.sendVerificationCode(email, code);
   }
 }

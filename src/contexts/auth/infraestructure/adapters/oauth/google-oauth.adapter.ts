@@ -1,6 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { GoogleUserInfo, IOAuthAdapter } from './oauth.adapter.interface';
 
@@ -8,15 +9,15 @@ import { GoogleUserInfo, IOAuthAdapter } from './oauth.adapter.interface';
 export class GoogleOAuthAdapter implements IOAuthAdapter {
   private client: OAuth2Client;
 
-  constructor() {
-    this.client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  constructor(private readonly configService: ConfigService) {
+    this.client = new OAuth2Client(this.configService.get<string>('GOOGLE_CLIENT_ID'));
   }
 
   async verifyGoogleToken(token: string): Promise<GoogleUserInfo> {
     try {
       const ticket = await this.client.verifyIdToken({
         idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
       });
 
       const payload = ticket.getPayload();

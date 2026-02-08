@@ -7,7 +7,7 @@ import { IJwtAdapter } from './jwt.adapter.interface';
 export class JwtAdapter implements IJwtAdapter {
   constructor(private readonly jwtService: JwtService) {}
 
-  sign(id: number) {
-    return this.jwtService.sign({ id });
+  sign(payload: any) {
+    return this.jwtService.sign(payload);
   }
 }

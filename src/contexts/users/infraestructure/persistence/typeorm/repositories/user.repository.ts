@@ -3,8 +3,8 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { UserRepository } from '../../../domain';
-import { User, UserPrimitives } from '../../../domain/entities';
+import { UserRepository } from '../../../../domain';
+import { User, UserPrimitives } from '../../../../domain/entities';
 
 import { UserSchema } from '../schemas';
 
@@ -67,21 +67,17 @@ export class TypeOrmUserRepository implements UserRepository {
         'user.names',
         'user.last_names',
         'user.phone',
-        'user.login_email_code',
-        'user.has_login_google',
-        'user.expires_email_code',
+        'user.is_active',
       ])
-      .where('user.email = :id', { id })
+      .where('user.id = :id', { id })
       .getOne();
 
     return user ? User.fromObject(user) : null;
   }
 
-  async update(data: User): Promise<User> {
-    await this.repository.update(data.id, data);
+  async update(id: number, data: Partial<UserPrimitives>): Promise<void> {
+    await this.findById(id);
 
-    const userUpdated = await this.findById(data.id!);
-
-    return userUpdated!;
+    await this.repository.update(id, data);
   }
 }

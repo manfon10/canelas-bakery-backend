@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
 import { type IEmailAdapter } from '@/contexts/shared/adapters/email';
 
-import { User, UserRepository } from '@/contexts/users/domain';
+import { UserRepository } from '@/contexts/users/domain';
 
 import { RegisterUserDto } from './register-user.dto';
 
@@ -25,7 +25,7 @@ export class RegisterUserUseCase {
       throw new BadRequestException('El correo electronico ya existe en nuestro sistema');
     }
 
-    const code = User.codeLogin();
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     await this.userRepository.create({
       email,
@@ -36,6 +36,6 @@ export class RegisterUserUseCase {
       expires_email_code: new Date(Date.now() + 10 * 60 * 1000),
     });
 
-    await this.emailAdapter.sendVerificationCode(email, code);
+    await this.emailAdapter.sendRegisterUser(email, code);
   }
 }

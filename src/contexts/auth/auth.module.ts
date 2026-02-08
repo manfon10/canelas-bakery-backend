@@ -18,8 +18,11 @@ import {
   VerifiLoginCodeController,
 } from './infraestructure/controllers';
 import { getJwtConfig } from './infraestructure/config';
+import { JwtAuthGuard } from './infraestructure/guards';
+import { JwtStrategy } from './infraestructure/strategies';
 
 import { MailModule } from '@/contexts/shared/adapters/email';
+
 import { UserModule } from '@/contexts/users/user.module';
 
 @Module({
@@ -39,6 +42,8 @@ import { UserModule } from '@/contexts/users/user.module';
     VerifiLoginCodeController,
   ],
   providers: [
+    JwtAuthGuard,
+    JwtStrategy,
     {
       provide: 'AuthAdapter',
       useClass: GoogleOAuthAdapter,
@@ -52,5 +57,6 @@ import { UserModule } from '@/contexts/users/user.module';
     GoogleLoginUseCase,
     VerifyLoginCodeUseCase,
   ],
+  exports: [JwtAuthGuard],
 })
 export class AuthModule {}

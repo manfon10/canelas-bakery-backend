@@ -5,6 +5,7 @@ import { TypeOrmDatabaseModule } from '@/contexts/shared/database/typeorm/typeor
 
 import { UserModule } from '@/contexts/users/user.module';
 import { AuthModule } from '@/contexts/auth/auth.module';
+import { ProductModule } from '@/contexts/products/product.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthModule } from '@/contexts/auth/auth.module';
 
     AuthModule,
     UserModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

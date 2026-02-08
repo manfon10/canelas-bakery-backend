@@ -1,5 +1,4 @@
 export interface UserPrimitives {
-  id?: number;
   names: string;
   email: string;
   phone?: string;
@@ -7,6 +6,7 @@ export interface UserPrimitives {
   login_email_code?: string | null;
   expires_email_code?: Date | null;
   has_login_google?: boolean;
+  email_verified?: boolean;
 }
 
 export class User {
@@ -20,6 +20,7 @@ export class User {
     public readonly expires_email_code: Date,
     public readonly has_login_google: boolean,
     public readonly is_active: boolean,
+    public readonly email_verified: boolean,
   ) {}
 
   static fromObject(object: { [key: string]: any }): User {
@@ -33,6 +34,7 @@ export class User {
       expires_email_code,
       has_login_google,
       is_active,
+      email_verified,
     } = object;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -46,10 +48,11 @@ export class User {
       expires_email_code,
       has_login_google,
       is_active,
+      email_verified,
     );
   }
 
-  static codeLogin() {
+  codeLogin() {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 

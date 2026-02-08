@@ -30,10 +30,10 @@ export class VerifyLoginCodeUseCase {
       throw new BadRequestException('El código es invalido');
     }
 
-    await this.userRepository.update({
-      id: user.id,
+    await this.userRepository.update(user.id, {
       login_email_code: null,
       expires_email_code: null,
+      email_verified: true,
     });
 
     const payload = { id: user.id };

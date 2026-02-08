@@ -5,8 +5,8 @@ import { GetAllUsersController } from './infraestructure/controllers';
 
 import { GetAllUsersUseCase } from './application';
 
-import { UserSchema } from './infraestructure/persistence/schemas';
-import { TypeOrmUserRepository } from './infraestructure/persistence/typeorm';
+import { UserSchema } from './infraestructure/persistence/typeorm/schemas';
+import { TypeOrmUserRepository } from './infraestructure/persistence/typeorm/repositories';
 
 @Module({
   controllers: [GetAllUsersController],
