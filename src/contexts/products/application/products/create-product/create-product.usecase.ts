@@ -15,8 +15,8 @@ export class CreateProductUseCase {
     private readonly productCategoryRepository: ProductCategoryRepository,
   ) {}
 
-  async execue(data: CreateProductDto): Promise<Product> {
-    const { base_price, category_id, description, name } = data;
+  async execute(data: CreateProductDto): Promise<Product> {
+    const { base_price, category_id, description, name, type } = data;
 
     const category = await this.productCategoryRepository.findById(category_id);
 
@@ -33,6 +33,7 @@ export class CreateProductUseCase {
       category_id,
       description,
       name,
+      type,
     });
   }
 }

@@ -3,4 +3,5 @@ export interface CreateProductDto {
   description: string;
   base_price: number;
   category_id: number;
+  type: string;
 }

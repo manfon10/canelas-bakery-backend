@@ -1,10 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CreateProductCategoryController } from './infraestructure/controllers/categories';
+import {
+  CreateProductCategoryController,
+  DeleteProductCategoryController,
+  GetAllProductCategoriesController,
+  GetProductCategoryByIdController,
+  UpdateProductCategoryByIdController,
+} from './infraestructure/controllers/categories';
 import {
   CreateProductController,
   GetAllProductsController,
+  GetProductBySlugController,
+  UpdateProductByIdController,
 } from './infraestructure/controllers/product';
 
 import {
@@ -18,12 +26,35 @@ import {
   ProductCustomizationOptionSchema,
   ProductSchema,
 } from './infraestructure/persistence/typeorm/schemas';
+import { ProductSchemaSubscriber } from './infraestructure/persistence/typeorm/subscribers';
 
-import { CreateProductCategoryUseCase } from './application/categories';
-import { CreateProductUseCase, GetAllProductsUseCase } from './application/products';
+import {
+  CreateProductCategoryUseCase,
+  DeleteProductCategoryByIdUseCase,
+  GetAllProductCategoriesUseCase,
+  GetProductCategoryByIdUseCase,
+  UpdateProductCategoryByIdUseCase,
+} from './application/categories';
+import {
+  CreateProductUseCase,
+  GetAllProductsUseCase,
+  GetProductBySlugUseCase,
+  UpdateProductUseCase,
+} from './application/products';
 
 @Module({
-  controllers: [CreateProductCategoryController, CreateProductController, GetAllProductsController],
+  controllers: [
+    CreateProductCategoryController,
+    DeleteProductCategoryController,
+    GetAllProductCategoriesController,
+    GetProductCategoryByIdController,
+    UpdateProductCategoryByIdController,
+
+    CreateProductController,
+    GetAllProductsController,
+    GetProductBySlugController,
+    UpdateProductByIdController,
+  ],
   imports: [
     TypeOrmModule.forFeature([
       ProductCategorySchema,
@@ -35,8 +66,16 @@ import { CreateProductUseCase, GetAllProductsUseCase } from './application/produ
   ],
   providers: [
     CreateProductCategoryUseCase,
+    DeleteProductCategoryByIdUseCase,
+    GetAllProductCategoriesUseCase,
+    GetProductCategoryByIdUseCase,
+    UpdateProductCategoryByIdUseCase,
+
     CreateProductUseCase,
     GetAllProductsUseCase,
+    GetProductBySlugUseCase,
+    UpdateProductUseCase,
+
     {
       provide: 'ProductRepository',
       useClass: TypeOrmProductRepositoryImpl,
@@ -45,6 +84,8 @@ import { CreateProductUseCase, GetAllProductsUseCase } from './application/produ
       provide: 'ProductCategoryRepository',
       useClass: TypeOrmProductCategoryRepositoryImpl,
     },
+
+    ProductSchemaSubscriber,
   ],
   exports: ['ProductRepository', 'ProductCategoryRepository'],
 })

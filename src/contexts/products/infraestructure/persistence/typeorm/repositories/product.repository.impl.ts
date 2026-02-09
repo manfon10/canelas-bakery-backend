@@ -23,7 +23,8 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
     const product = await this.repository
       .createQueryBuilder('product')
       .leftJoin('product.category', 'category')
-      .leftJoin('category.customizations', 'customization_category')
+      .leftJoin('category.customizations', 'customizations')
+      .leftJoin('customizations.customization_category', 'customization_category')
       .leftJoin('customization_category.customization_options', 'customization_options')
       .select([
         'product.id',
@@ -31,11 +32,13 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
         'product.description',
         'product.base_price',
         'product.is_active',
+        'product.slug',
+        'product.type',
 
         'category.id',
         'category.name',
 
-        'customization.order',
+        'customizations.order',
 
         'customization_category.id',
         'customization_category.name',
@@ -47,8 +50,48 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
         'customization_options.id',
         'customization_options.name',
         'customization_options.extra_price',
+        'customization_options.description',
       ])
       .where('product.id = :id', { id })
+      .getOne();
+
+    return product ? Product.fromObject(product) : null;
+  }
+
+  async findBySlug(slug: string): Promise<Product | null> {
+    const product = await this.repository
+      .createQueryBuilder('product')
+      .leftJoin('product.category', 'category')
+      .leftJoin('category.customizations', 'customizations')
+      .leftJoin('customizations.customization_category', 'customization_category')
+      .leftJoin('customization_category.customization_options', 'customization_options')
+      .select([
+        'product.id',
+        'product.name',
+        'product.description',
+        'product.base_price',
+        'product.is_active',
+        'product.slug',
+        'product.type',
+
+        'category.id',
+        'category.name',
+
+        'customizations.order',
+
+        'customization_category.id',
+        'customization_category.name',
+        'customization_category.type',
+        'customization_category.required',
+        'customization_category.min',
+        'customization_category.max',
+
+        'customization_options.id',
+        'customization_options.name',
+        'customization_options.extra_price',
+        'customization_options.description',
+      ])
+      .where('product.slug = :slug', { slug })
       .getOne();
 
     return product ? Product.fromObject(product) : null;
@@ -67,6 +110,8 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
         'product.description',
         'product.base_price',
         'product.is_active',
+        'product.slug',
+        'product.type',
 
         'category.id',
         'category.name',
@@ -93,8 +138,6 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
   }
 
   async update(id: number, data: Partial<ProductPrimitives>): Promise<void> {
-    await this.findById(id);
-
     await this.repository.update(id, data);
   }
 }

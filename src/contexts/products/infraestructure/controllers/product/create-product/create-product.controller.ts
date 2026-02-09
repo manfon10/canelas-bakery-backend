@@ -14,6 +14,6 @@ export class CreateProductController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async run(@Body() data: CreateProductDto): Promise<ProductCategory> {
-    return await this.createProduct.execue(data);
+    return await this.createProduct.execute(data);
   }
 }

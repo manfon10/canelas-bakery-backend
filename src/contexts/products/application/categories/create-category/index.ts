@@ -1,1 +1,1 @@
-export * from './create-product-category.usecase';
+export { CreateProductCategoryUseCase } from './create-product-category.usecase';

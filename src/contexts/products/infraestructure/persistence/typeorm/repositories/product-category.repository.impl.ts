@@ -21,6 +21,10 @@ export class TypeOrmProductCategoryRepositoryImpl implements ProductCategoryRepo
     return productCategory!;
   }
 
+  async delete(id: number): Promise<void> {
+    await this.repository.delete({ id });
+  }
+
   async findById(id: number): Promise<ProductCategory | null> {
     const productCategory = await this.repository
       .createQueryBuilder('product_category')
