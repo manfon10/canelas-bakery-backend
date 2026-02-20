@@ -10,8 +10,9 @@ Backend de un e-commerce personalizado para una tienda de repostería canina. Co
 |---|---|
 | **NestJS** | Framework principal |
 | **PostgreSQL** | Base de datos relacional |
-| **TypeORM / Prisma** | ORM |
+| **TypeORM** | ORM |
 | **JWT** | Autenticación |
+| **Docker** | Entorno de desarrollo |
 
 ---
 
@@ -25,13 +26,12 @@ src/
 │   └── [module]/
 │       ├── domain/               # Entidades y lógica de negocio pura
 │       │   ├── entities/
-│       │   ├── ports/            # Interfaces (contratos) de entrada y salida
-│       │   └── value-objects/
+│       │   └── repositories/
 │       ├── application/          # Casos de uso
 │       │   └── use-cases/
 │       └── infrastructure/       # Adaptadores (DB, HTTP, externos)
 │           ├── persistence/      # Repositorios concretos
-│           └── http/             # Controladores y DTOs
+│           └── controllers/      # Controladores y DTOs
 └── shared/                       # Código compartido entre módulos
 ```
 
@@ -53,27 +53,29 @@ El sistema soporta dos métodos de login, ambos implementados como **adaptadores
 [Cliente]
     │
     ▼
-POST /auth/otp/request  { email }
+POST /auth/send-code  { email }
     │
     ▼
-[Application Layer - RequestOtpUseCase]
-    │  Usa el puerto ──► OtpProviderPort (interfaz)
-    │                        │
-    │                        ▼
-    │               [Adapter: NodemailerOtpAdapter]
-    │               Genera código, lo guarda en DB
-    │               con TTL y lo envía por email
+[Application Layer - SendLoginCodeUseCase]
+    │
+    ├── UserRepository (interfaz) ──► [Adapter: UserRepository]
+    │                                  Busca si el usuario existe en DB, si existe persiste
+    │                                  el código OTP en BD.
+    |
+    └── EmailAdapter (interfaz)   ──► [Adapter: IEmailAdapter]
+                                       Envía por email el código generado.
     ▼
-POST /auth/otp/verify   { email, code }
+POST /auth/verify-code  { email, code }
     │
     ▼
-[Application Layer - VerifyOtpUseCase]
-    │  Valida código y expiración
-    │  Usa el puerto ──► TokenProviderPort (interfaz)
-    │                        │
-    │                        ▼
-    │               [Adapter: JwtTokenAdapter]
-    │               Genera y retorna JWT
+[Application Layer - VerifyLoginCodeUseCase]
+    │
+    ├── UserRepository (interfaz) ──► [Adapter: UserRepository]
+    │                                  Busca usuario y valida el código OTP
+    │                                  con su expiración en DB
+    │
+    └── JwtAdapter (interfaz)     ──► [Adapter: IJwtAdapter]
+                                       Genera y retorna el JWT
     ▼
 { access_token }
 ```
@@ -88,18 +90,17 @@ POST /auth/google  { id_token }
     │
     ▼
 [Application Layer - GoogleLoginUseCase]
-    │  Usa el puerto ──► OAuthProviderPort (interfaz)
-    │                        │
-    │                        ▼
-    │               [Adapter: GoogleOAuthAdapter]
-    │               Verifica id_token con Google API
-    │               Retorna perfil { email, name, picture }
     │
-    │  Si el usuario no existe → se crea automáticamente
-    │  Usa el puerto ──► TokenProviderPort (interfaz)
-    │                        │
-    │                        ▼
-    │               [Adapter: JwtTokenAdapter]
+    ├── OAuthAdapter (interfaz)   ──► [Adapter: IOAuthAdapter]
+    │                                  Verifica id_token con Google API
+    │                                  Retorna perfil { email, name, picture }
+    │
+    ├── UserRepository (interfaz) ──► [Adapter: UserRepository]
+    │                                  Busca usuario por email
+    │                                  Si no existe → lo crea automáticamente
+    │
+    └── JwtAdapter (interfaz)     ──► [Adapter: IJwtAdapter]
+                                       Genera y retorna el JWT
     ▼
 { access_token }
 ```
