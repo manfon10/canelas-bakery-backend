@@ -1,98 +1,273 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Canelas Bakery — Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend de un e-commerce personalizado para una tienda de repostería canina. Construido con **NestJS**, arquitectura **hexagonal (ports & adapters)**, y base de datos **PostgreSQL**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Tech Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Tecnología | Uso |
+|---|---|
+| **NestJS** | Framework principal |
+| **PostgreSQL** | Base de datos relacional |
+| **TypeORM** | ORM |
+| **JWT** | Autenticación |
+| **Docker** | Entorno de desarrollo |
 
-## Project setup
+---
 
-```bash
-$ npm install
+## Arquitectura Hexagonal
+
+El proyecto sigue el patrón **Hexagonal Architecture (Ports & Adapters)**, separando el dominio del negocio de los detalles de infraestructura.
+
+```
+src/
+├── modules/
+│   └── [module]/
+│       ├── domain/               # Entidades y lógica de negocio pura
+│       │   ├── entities/
+│       │   └── repositories/
+│       ├── application/          # Casos de uso
+│       │   └── use-cases/
+│       └── infrastructure/       # Adaptadores (DB, HTTP, externos)
+│           ├── persistence/      # Repositorios concretos
+│           └── controllers/      # Controladores y DTOs
+└── shared/                       # Código compartido entre módulos
 ```
 
-## Compile and run the project
+**Capas:**
 
-```bash
-# development
-$ npm run start
+- **Domain** — Entidades y reglas de negocio sin dependencias externas.
+- **Application** — Orquesta los casos de uso usando los puertos definidos.
+- **Infrastructure** — Implementa los puertos: controladores HTTP, repositorios de DB, servicios externos.
 
-# watch mode
-$ npm run start:dev
+---
 
-# production mode
-$ npm run start:prod
+## Autenticación
+
+El sistema soporta dos métodos de login, ambos implementados como **adaptadores** siguiendo los principios de la arquitectura hexagonal.
+
+### Flujo 1 — Login por Email + Código OTP
+
+```
+[Cliente]
+    │
+    ▼
+POST /auth/send-code  { email }
+    │
+    ▼
+[Application Layer - SendLoginCodeUseCase]
+    │
+    ├── UserRepository (interfaz) ──► [Adapter: UserRepository]
+    │                                  Busca si el usuario existe en DB, si existe persiste
+    │                                  el código OTP en BD.
+    |
+    └── EmailAdapter (interfaz)   ──► [Adapter: IEmailAdapter]
+                                       Envía por email el código generado.
+    ▼
+POST /auth/verify-code  { email, code }
+    │
+    ▼
+[Application Layer - VerifyLoginCodeUseCase]
+    │
+    ├── UserRepository (interfaz) ──► [Adapter: UserRepository]
+    │                                  Busca usuario y valida el código OTP
+    │                                  con su expiración en DB
+    │
+    └── JwtAdapter (interfaz)     ──► [Adapter: IJwtAdapter]
+                                       Genera y retorna el JWT
+    ▼
+{ access_token }
 ```
 
-## Run tests
+### Flujo 2 — Login con Google OAuth
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+[Cliente]
+    │
+    ▼
+POST /auth/google  { id_token }
+    │
+    ▼
+[Application Layer - GoogleLoginUseCase]
+    │
+    ├── OAuthAdapter (interfaz)   ──► [Adapter: IOAuthAdapter]
+    │                                  Verifica id_token con Google API
+    │                                  Retorna perfil { email, name, picture }
+    │
+    ├── UserRepository (interfaz) ──► [Adapter: UserRepository]
+    │                                  Busca usuario por email
+    │                                  Si no existe → lo crea automáticamente
+    │
+    └── JwtAdapter (interfaz)     ──► [Adapter: IJwtAdapter]
+                                       Genera y retorna el JWT
+    ▼
+{ access_token }
 ```
 
-## Deployment
+## Módulos del Sistema
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Productos
+Gestión del catálogo de la tienda. Los productos pertenecen a una **categoría** y pueden tener **personalizaciones** (sabor, tamaño, glaseado, toppings, etc.), organizadas en categorías de personalización con opciones y precios adicionales.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Los productos también soportan **bundles**: un producto puede contener otros productos hijos como parte de un paquete.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### Carrito
+Cada usuario tiene un carrito activo (`carts`). El carrito contiene items (`carts_items`) con sus respectivas personalizaciones seleccionadas (`cart_item_customization_options`) y notas especiales.
+
+### Órdenes
+Al finalizar la compra, el carrito se convierte en una orden (`orders`). Cada orden registra:
+- Items con snapshot de nombre y precio (`order_items`)
+- Personalizaciones elegidas (`order_item_customization_options`)
+- Método de pago y franja horaria de entrega
+- Descuentos y deducciones aplicadas (`order_deductions`)
+
+### Pagos
+Los pagos se registran en `payments` y pueden incluir comprobantes (capturas de pantalla) en `payment_proofs`. Soporta pagos anticipados (`is_advance`).
+
+### Descuentos y Cupones
+Los descuentos (`discounts`) pueden aplicarse a productos individuales o categorías enteras. Los cupones (`coupons`) tienen código único, límite de uso y fecha de expiración. Los canjes se registran en `coupon_redemptions`.
+
+### Entregas
+La disponibilidad de entregas se gestiona con:
+- `delivery_weekly_schedule` — Días habilitados de la semana
+- `delivery_time_slots` — Franjas horarias con capacidad máxima por día
+- `delivery_blackout_days` — Días bloqueados con motivo
+- `delivery_day_capacity` — Capacidad global de entregas por día
+
+### Costos de Producción
+Cada item de una orden puede tener asociado un costo de producción (`production_costs`) con su detalle desglosado (`production_cost_detail`), permitiendo calcular la utilidad real por orden.
+
+### Mascotas de Usuarios
+Los usuarios pueden registrar sus mascotas (`user_pets`) con nombre, raza y fecha de nacimiento, pensado para personalización de productos.
+
+### Calificaciones
+Se pueden calificar tanto la orden completa (`order_ratings`) como productos individuales (`product_ratings`) vinculados al item específico de la orden.
+
+---
+
+## Diagrama de Base de Datos
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          USUARIOS & ROLES                               │
+│                                                                         │
+│  roles ──────────────────── users ─────────────────── user_addresses   │
+│  (id, name, slug)     (id, names, role_id)         (address, city...)  │
+│       │                      │                                          │
+│  role_menus                user_pets                                    │
+│       │                 (name, breed...)                                │
+│  menus                                                                  │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          CATÁLOGO DE PRODUCTOS                          │
+│                                                                         │
+│  product_categories                                                     │
+│       │ ↓                                                               │
+│  products ◄──────── product_bundles (bundle ↔ child)                   │
+│       │                                                                 │
+│  product_category_customizations                                        │
+│       │                                                                 │
+│  product_customization_categories                                       │
+│       │ ↓                                                               │
+│  product_customization_options                                          │
+│       │                                                                 │
+│  product_recipes ◄── product_recipe_items ──► ingredients              │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          CARRITO & ÓRDENES                              │
+│                                                                         │
+│  users                                                                  │
+│   └─► carts                                                             │
+│         └─► carts_items                                                 │
+│               └─► cart_item_customization_options                       │
+│                         │                                               │
+│                         ▼                                               │
+│                       orders ◄──── payment_methods                     │
+│                         │    ◄──── delivery_time_slots                  │
+│                         ├─► order_items                                 │
+│                         │     └─► order_item_customization_options      │
+│                         │     └─► production_costs                      │
+│                         │           └─► production_cost_detail          │
+│                         ├─► order_deductions                            │
+│                         ├─► order_ratings                               │
+│                         └─► payments                                    │
+│                               └─► payment_proofs                       │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        DESCUENTOS & CUPONES                             │
+│                                                                         │
+│  discounts                                                              │
+│   ├─► discount_products      (descuento por producto)                  │
+│   ├─► discount_product_categories (descuento por categoría)            │
+│   └─── coupons                                                          │
+│           └─► coupon_redemptions (user ↔ coupon ↔ order)              │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          ENTREGAS                                       │
+│                                                                         │
+│  delivery_weekly_schedule                                               │
+│   └─► delivery_time_slots ──────────────────────────► orders           │
+│                                                                         │
+│  delivery_blackout_days    (días bloqueados)                            │
+│  delivery_day_capacity     (capacidad global diaria)                    │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Entidades Principales
 
-Check out a few resources that may come in handy when working with NestJS:
+| Tabla | Descripción |
+|---|---|
+| `users` | Usuarios del sistema con rol asignado |
+| `products` | Productos del catálogo con precio base |
+| `product_customization_categories` | Grupos de personalización (tamaño, sabor, glaseado…) |
+| `product_customization_options` | Opciones dentro de cada grupo con precio extra |
+| `carts` / `carts_items` | Carrito activo por usuario |
+| `orders` / `order_items` | Órdenes generadas al confirmar compra |
+| `payments` | Pagos registrados por orden |
+| `discounts` / `coupons` | Descuentos y cupones con reglas de aplicación |
+| `delivery_time_slots` | Franjas horarias de entrega con capacidad |
+| `production_costs` | Costos reales de producción por item |
+| `ingredients` | Ingredientes usados en recetas de productos |
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## Instalación
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Instalar dependencias
+npm install
 
-## Stay in touch
+# Variables de entorno
+cp .env.example .env
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Iniciar en desarrollo
+npm run start:dev
+```
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Variables de Entorno
+
+```env
+NODE_ENV=
+
+JWT_SECRET=
+JWT_EXPIRES_IN=
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REFRESH_TOKEN=
+
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_DATABASE=
+```
