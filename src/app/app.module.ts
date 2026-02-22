@@ -6,6 +6,9 @@ import { TypeOrmDatabaseModule } from '@/contexts/shared/database/typeorm/typeor
 import { UserModule } from '@/contexts/users/user.module';
 import { AuthModule } from '@/contexts/auth/auth.module';
 import { ProductModule } from '@/contexts/products/product.module';
+import { CartModule } from '@/contexts/carts/cart.module';
+import { DeliveryModule } from '@/contexts/deliveries/delivery.module';
+import { OrderModule } from '@/contexts/orders/order.module';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { ProductModule } from '@/contexts/products/product.module';
     AuthModule,
     UserModule,
     ProductModule,
+    CartModule,
+    DeliveryModule,
+    OrderModule,
   ],
 })
 export class AppModule {}

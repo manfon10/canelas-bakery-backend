@@ -60,6 +60,7 @@ export class ProductSchemaSubscriber implements EntitySubscriberInterface<Produc
 
     let isCodeUnique = false;
     let attempts = 0;
+
     const maxAttempts = 10;
 
     while (!isCodeUnique && attempts < maxAttempts) {

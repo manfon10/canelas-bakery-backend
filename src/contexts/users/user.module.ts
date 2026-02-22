@@ -5,12 +5,17 @@ import { GetAllUsersController } from './infraestructure/controllers';
 
 import { GetAllUsersUseCase } from './application';
 
-import { UserSchema } from './infraestructure/persistence/typeorm/schemas';
+import {
+  UserAddressSchema,
+  UserPetSchema,
+  UserSchema,
+} from './infraestructure/persistence/typeorm/schemas';
+
 import { TypeOrmUserRepository } from './infraestructure/persistence/typeorm/repositories';
 
 @Module({
   controllers: [GetAllUsersController],
-  imports: [TypeOrmModule.forFeature([UserSchema])],
+  imports: [TypeOrmModule.forFeature([UserSchema, UserPetSchema, UserAddressSchema])],
   providers: [
     GetAllUsersUseCase,
     {

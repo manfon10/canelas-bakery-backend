@@ -11,21 +11,17 @@ export class ProductCustomizationCategorySchema {
   @Column()
   name: string;
 
-  @Column({
-    type: 'enum',
-    name: 'type',
-    enum: ['single', 'multiple', 'quantity'],
-  })
-  type: 'single' | 'multiple' | 'quantity';
+  @Column({ type: 'varchar', name: 'type', length: 100 })
+  type: string;
 
   @Column({ type: 'boolean', name: 'required', default: false })
   required: boolean;
 
   @Column({ type: 'int', name: 'min', nullable: true })
-  min?: number;
+  min: number | null;
 
   @Column({ type: 'int', name: 'max', nullable: true })
-  max?: number;
+  max: number | null;
 
   @OneToMany(
     () => ProductCategoryCustomizationSchema,

@@ -3,3 +3,4 @@ export { ProductSchema } from './product.schema';
 export { ProductCategoryCustomizationSchema } from './product-category-customization.schema';
 export { ProductCustomizationCategorySchema } from './product-customization-category.schema';
 export { ProductCustomizationOptionSchema } from './product-customization-option.schema';
+export { ProductRatingSchema } from './product-rating.schema';

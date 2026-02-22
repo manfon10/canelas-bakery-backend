@@ -6,11 +6,14 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { ProductCategorySchema } from './product-category.schema';
+import { CartItemSchema } from '@/contexts/carts/infraestructure/typeorm/schemas';
+import { ProductRatingSchema } from './product-rating.schema';
 
 @Entity('products')
 @Index('IDX_PRODUCTS_IS_ACTIVE', ['is_active'])
@@ -49,6 +52,12 @@ export class ProductSchema {
   @ManyToOne(() => ProductCategorySchema)
   @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
   category!: Awaited<ProductCategorySchema>;
+
+  @OneToMany(() => CartItemSchema, (cartItemSchema) => cartItemSchema.product)
+  cart_item_products: Awaited<CartItemSchema[]>;
+
+  @OneToMany(() => ProductRatingSchema, (productRatingSchema) => productRatingSchema.product)
+  product_ratings: Awaited<ProductRatingSchema[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

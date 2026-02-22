@@ -34,6 +34,7 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
         'product.is_active',
         'product.slug',
         'product.type',
+        'product.code',
 
         'category.id',
         'category.name',
@@ -73,6 +74,7 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
         'product.is_active',
         'product.slug',
         'product.type',
+        'product.code',
 
         'category.id',
         'category.name',
@@ -112,6 +114,7 @@ export class TypeOrmProductRepositoryImpl implements ProductRepository {
         'product.is_active',
         'product.slug',
         'product.type',
+        'product.code',
 
         'category.id',
         'category.name',

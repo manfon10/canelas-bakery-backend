@@ -16,6 +16,9 @@ export class ProductCustomizationOptionSchema {
   @Column({ type: 'int', name: 'extra_price', default: 0 })
   extra_price: number;
 
+  @Column({ type: 'int', name: 'customization_category_id' })
+  customization_category_id: number;
+
   @ManyToOne(
     () => ProductCustomizationCategorySchema,
     (category) => category.customization_options,

@@ -15,19 +15,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@app/*": ["src/app/*"],
-      "@contexts/*": ["src/contexts/*"],
-      "@auth/*": ["src/contexts/auth/*"],
-      "@cart/*": ["src/contexts/cart/*"],
-      "@content/*": ["src/contexts/content/*"],
-      "@delivery/*": ["src/contexts/delivery/*"],
-      "@discounts/*": ["src/contexts/discounts/*"],
-      "@orders/*": ["src/contexts/orders/*"],
-      "@payments/*": ["src/contexts/payments/*"],
-      "@pets/*": ["src/contexts/pets/*"],
-      "@production/*": ["src/contexts/production/*"],
-      "@products/*": ["src/contexts/products/*"],
-      "@shared/*": ["src/contexts/shared/*"],
-      "@users/*": ["src/contexts/users/*"]
+      "@contexts/*": ["src/contexts/*"]
     },
     "target": "es2022"
   },

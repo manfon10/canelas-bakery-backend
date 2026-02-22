@@ -7,7 +7,7 @@ export class ProductCategory {
   constructor(
     public readonly id: number,
     public readonly name: string,
-    public readonly is_active: string,
+    public readonly is_active: boolean,
   ) {}
 
   static fromObject(object: { [key: string]: any }): ProductCategory {

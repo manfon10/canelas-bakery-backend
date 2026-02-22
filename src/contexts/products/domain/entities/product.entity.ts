@@ -1,4 +1,3 @@
-import { ProductType } from '../enums';
 import { ProductCategory } from './product-category.entity';
 
 export interface ProductPrimitives {
@@ -18,13 +17,14 @@ export class Product {
     public readonly base_price: string,
     public readonly slug: string,
     public readonly type: string,
-    public readonly is_active: string,
+    public readonly code: string,
+    public readonly is_active: boolean,
     public readonly category: ProductCategory,
   ) {}
 
   static fromObject(object: { [key: string]: any }): Product {
-    const { id, name, description, base_price, slug, type, is_active, category } = object;
+    const { id, name, description, base_price, slug, type, code, is_active, category } = object;
 
-    return new Product(id, name, description, base_price, slug, type, is_active, category);
+    return new Product(id, name, description, base_price, slug, type, code, is_active, category);
   }
 }
